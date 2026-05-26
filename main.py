@@ -106,4 +106,4 @@ def callback_listener(call):
 if __name__ == '__main__':
     set_bot_commands()
     print("Harar Bingo bot is running successfully...")
-    
+    bot.infinity_polling()
