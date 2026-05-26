@@ -1,4 +1,4 @@
-import telebot
+00import telebot
 from telebot import types
 
 # የአዲሱ ቦት ቶክን እና የዌብ አፕሊኬሽን ሊንክ ውህደት
@@ -8,7 +8,7 @@ bot = telebot.TeleBot(API_TOKEN)
 # የድሮ ግንኙነቶችን በሙሉ በማጽዳት ሰርቨሩ ያለምንም ስህተት እንዲነሳ ያደርጋል
 bot.delete_webhook()
 
-WEBAPP_URL = "https://tiiny.site"
+WEBAPP_URL="https://tiiny.site"
 
 
 def set_bot_commands():
