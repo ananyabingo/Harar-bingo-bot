@@ -1,3 +1,25 @@
+import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import threading
+
+# Render ፖርት እንዲያገኝ የሚረዳ አጭር ሰርቨር
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+
+def run_health_check():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
+
+# ሰርቨሩን በባግራውንድ ያስነሳል
+threading.Thread(target=run_health_check, daemon=True).start()
+
+# ከዚህ በታች የእርስዎ የቦት ኮድ ይቀጥላል...
+
 import telebot
 from telebot import types
 
