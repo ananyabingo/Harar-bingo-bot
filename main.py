@@ -1,4 +1,4 @@
-00import telebot
+import telebot
 from telebot import types
 
 # የአዲሱ ቦት ቶክን እና የዌብ አፕሊኬሽን ሊንክ ውህደት
