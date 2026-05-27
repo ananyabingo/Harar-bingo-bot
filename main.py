@@ -1,8 +1,10 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
+import telebot
+from telebot import types
 
-# Render ፖርት እንዲያገኝ የሚረዳ አጭር ሰርቨር
+# Render ፖርት እንዲያገኝ የሚያደርግ አጭር ሰርቨር
 class HealthCheckHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -15,117 +17,80 @@ def run_health_check():
     server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
     server.serve_forever()
 
-# ሰርቨሩን በባግራውንድ ያስነሳል
+# ሰርቨሩን በጀርባ እንዲሰራ ያደርጋል
 threading.Thread(target=run_health_check, daemon=True).start()
 
-# ከዚህ በታች የእርስዎ የቦት ኮድ ይቀጥላል...
-
-import telebot
-from telebot import types
-
-# የአዲሱ ቦት ቶክን እና የዌብ አፕሊኬሽን ሊንክ ውህደት
-API_TOKEN = '8850948511:AAH8UiHe073d38byzo9cfdkpZA0F9_2OdJY'
+# --- የቦትዎ ቶከን ---
+API_TOKEN = '8850948511:AAH8UiHe073d38byzo9cfdkpZA0F9_20djY'
 bot = telebot.TeleBot(API_TOKEN)
 
-# የድሮ ግንኙነቶችን በሙሉ በማጽዳት ሰርቨሩ ያለምንም ስህተት እንዲነሳ ያደርጋል
 bot.delete_webhook()
 
-WEBAPP_URL="https://tiiny.site"
+# --- የእርስዎ የቢንጎ ጨዋታ ዌብሳይት ሊንክ ---
+WEBAPP_URL = "https://tiiny.site"
 
-
+# የቦቱ አዝራሮች (Commands) በአማርኛ
 def set_bot_commands():
     commands = [
-        types.BotCommand("start", "Start Harar Bingo"),
-        types.BotCommand("register", "Register your account"),
-        types.BotCommand("play", "Play Bingo Game"),
-        types.BotCommand("deposit", "Deposit Money"),
-        types.BotCommand("balance", "Check Balance"),
-        types.BotCommand("withdraw", "Withdraw Money"),
-        types.BotCommand("transfer", "Transfer Balance"),
-        types.BotCommand("invite", "Invite Friends"),
-        types.BotCommand("instruction", "How to Play"),
-        types.BotCommand("support", "Contact Support")
+        types.BotCommand("start", "ቦቱን ለመቀስቀስ / አስጀምር"),
+        types.BotCommand("register", "ለመመዝገብ"),
+        types.BotCommand("play", "ቢንጎ ለመጫወት"),
+        types.BotCommand("deposit", "ብር ለማስገባት"),
     ]
     bot.set_my_commands(commands)
 
+set_bot_commands()
 
-def get_bingo_markup():
-    markup = types.InlineKeyboardMarkup(row_width=2)
+# የ /start ትዕዛዝ ሲላክ የሚመጣ መልስ
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    # --- የእርስዎ ስልክ ቁጥሮች እዚህ ተስተካክለዋል ---
+    owner_name = "የእርስዎ ስም"
+    account_1 = "0940403289"
+    account_2 = "0979152240"
     
-    # 10 ዋና ዋና የቢንጎ ቁልፎች ማውጫ
-    btn_play = types.InlineKeyboardButton("Play 🎰", web_app=types.WebAppInfo(url=WEBAPP_URL))
-    btn_register = types.InlineKeyboardButton("Register 📝", callback_data="btn_register")
-    btn_balance = types.InlineKeyboardButton("Check Balance 💵", callback_data="btn_balance")
-    btn_deposit = types.InlineKeyboardButton("Deposit 💰", callback_data="btn_deposit")
-    btn_support = types.InlineKeyboardButton("Contact Support ☎️", callback_data="btn_support")
-    btn_instruction = types.InlineKeyboardButton("Instruction 📖", callback_data="btn_instruction")
-    btn_transfer = types.InlineKeyboardButton("Transfer 🎁", callback_data="btn_transfer")
-    btn_withdraw = types.InlineKeyboardButton("Withdraw 🤑", callback_data="btn_withdraw")
-    btn_invite = types.InlineKeyboardButton("Invite 🔗", callback_data="btn_invite")
-    btn_bonus = types.InlineKeyboardButton("Convert Bonus 💎", callback_data="btn_bonus")
+    telegram_id = message.from_user.id
     
-    markup.add(btn_play, btn_register)
-    markup.add(btn_balance, btn_deposit)
-    markup.add(btn_support, btn_instruction)
-    markup.add(btn_transfer, btn_withdraw)
-    markup.add(btn_invite, btn_bonus)
-    
-    return markup
-
-
-@bot.message_handler(commands=['start', 'play', 'register', 'deposit', 'balance', 'withdraw', 'transfer', 'invite', 'instruction', 'support'])
-def handle_commands(message):
-    chat_id = message.chat.id
-    user_name = message.from_user.first_name
-    
-    # የእንኳን ደህና መጣህ ማስተካከያ ጽሑፍ
     welcome_text = (
-        f"Welcome {user_name} to **Harar Bingo Auto**!\n\n"
-        f"👤 **Account Owner Name:** ANANYA ADEFERS\n\n"
-        f"💳 **How to Deposit (Telebirr):**\n"
-        f"Send your game entry fee to one of these numbers:\n"
-        f"📱 Account 1: `0940403289`\n"
-        f"📱 Account 2: `0979152240`\n\n"
-        f"⚠️ **IMPORTANT:** You MUST put your Telegram ID `{chat_id}` in the reason/remark field when sending money!\n"
-        f"Once you sent the money, click the button below to start playing."
+        f"እንኳን ወደ ሀረር ቢንጎ በደህና መጡ! 🎰\n\n"
+        f"👤 የባንክ አካውንት ባለቤት ስም፦ {owner_name}\n\n"
+        f"💳 በቴሌብር (Telebirr) ገንዘብ ለማስገባት፦\n"
+        f"የጨዋታ መግቢያ ክፍያዎን ወደ አንደኛው ቁጥር ይላኩ፦\n"
+        f"የአካውንት ቁጥር 1፦ {account_1}\n"
+        f"የአካውንት ቁጥር 2፦ {account_2}\n\n"
+        f"⚠️ በጣም አስፈላጊ፦ ገንዘብ ሲልኩ በማስተወሻ (Reason/Remark) ቦታ ላይ "
+        f"ይህንን የእርስዎን የቴሌግራም መታወቂያ ቁጥር [{telegram_id}] የግድ ማስገባት አለብዎት!\n\n"
+        f"ገንዘብ ከላኩ በኋላ መጫወት ለመጀመር ከታች ያለውን 'ተጫወት 🎰' የሚለውን ይጫኑ።"
     )
     
-    markup = get_bingo_markup()
-    bot.send_message(chat_id, welcome_text, parse_mode="Markdown", reply_markup=markup)
+    # የመጫወቻ ኪቦርድ አዝራሮች በአማርኛ
+    markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    
+    # የዌብቪው (WebView) ጨዋታ መክፈቻ ቁልፍ
+    webapp_info = types.WebAppInfo(url=WEBAPP_URL)
+    play_btn = types.KeyboardButton(text="ተጫወት 🎰", web_app=webapp_info)
+    register_btn = types.KeyboardButton(text="ተመዝገብ 📝")
+    
+    balance_btn = types.KeyboardButton(text="ሒሳብ አሳይ 💵")
+    deposit_btn = types.KeyboardButton(text="ብር አስገባ 💰")
+    
+    support_btn = types.KeyboardButton(text="እርዳታ ☎️")
+    instruction_btn = types.KeyboardButton(text="መመሪያ 📖")
+    
+    transfer_btn = types.KeyboardButton(text="ብር አጋራ 🔁")
+    withdraw_btn = types.KeyboardButton(text="ብር አውጣ 🤑")
+    
+    invite_btn = types.KeyboardButton(text="ጋብዝ 🔗")
+    bonus_btn = types.KeyboardButton(text="ቦነስ ቀይር 💎")
+    
+    markup.add(play_btn, register_btn)
+    markup.add(balance_btn, deposit_btn)
+    markup.add(support_btn, instruction_btn)
+    markup.add(transfer_btn, withdraw_btn)
+    markup.add(invite_btn, bonus_btn)
+    
+    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_listener(call):
-    chat_id = call.message.chat.id
-    if call.data == "btn_register":
-        bot.send_message(chat_id, "📝 **Registration**\nPlease enter your phone number to register.")
-    elif call.data == "btn_balance":
-        bot.send_message(chat_id, "💵 **Your Balance:** 0.00 ETB")
-    elif call.data == "btn_deposit":
-        deposit_text = (
-            f"💰 **How to Deposit (Telebirr):**\n"
-            f"Send your game entry fee to one of these numbers:\n"
-            f"📱 Account 1: `0940403289`\n"
-            f"📱 Account 2: `0979152240`\n\n"
-            f"⚠️ **IMPORTANT:** You MUST put your Telegram ID `{chat_id}` in the reason/remark field when sending money!"
-        )
-        bot.send_message(chat_id, deposit_text, parse_mode="Markdown")
-    elif call.data == "btn_support":
-        bot.send_message(chat_id, "☎️ **Support:** Contact @Ananya_Adefers for help.")
-    elif call.data == "btn_instruction":
-        bot.send_message(chat_id, "📖 **Instruction:** Open the Web App, wait for numbers to be called out loud!")
-    elif call.data == "btn_transfer":
-        bot.send_message(chat_id, "🎁 **Transfer:** Enter the Telegram ID of the user you want to transfer money to.")
-    elif call.data == "btn_withdraw":
-        bot.send_message(chat_id, "🤑 **Withdrawal:** Enter the amount you want to withdraw to your Telebirr.")
-    elif call.data == "btn_invite":
-        bot.send_message(chat_id, f"🔗 **Your Invite Link:** https://t.me{bot.get_me().username}?start={chat_id}")
-    elif call.data == "btn_bonus":
-        bot.send_message(chat_id, "💎 **Bonus:** You don't have enough bonus points to convert yet.")
-    bot.answer_callback_query(call.id)
-
-
-if __name__ == '__main__':
-    set_bot_commands()
-    print("Harar Bingo bot is running successfully...")
-    bot.infinity_polling()
+# ቦቱን ማለቂያ በሌለው ሉፕ ማሰራት
+if __name__ == "__main__":
+    bot.polling(none_stop=True)
