@@ -20,13 +20,13 @@ def run_health_check():
 # ሰርቨሩን በጀርባ እንዲሰራ ያደርጋል
 threading.Thread(target=run_health_check, daemon=True).start()
 
-# --- የቦትዎ ቶከን ---
-API_TOKEN = '8850948511:AAH8UiHe073d38byzo9cfdkpZA0F9_20djY'
+# --- 1. አዲሱ ትክክለኛ የቦት ቶከን እዚህ ተስተካክሏል ---
+API_TOKEN = '8850948511:AAHC36oOh7p7Bm_bAZ8sdJw3Cgx5fOeOkTs'
 bot = telebot.TeleBot(API_TOKEN)
 
 bot.delete_webhook()
 
-# --- የእርስዎ የቢንጎ ጨዋታ ዌብሳይት ሊንክ ---
+# --- 2. የእርስዎ ትክክለኛ የቢንጎ ጨዋታ ሊንክ እዚህ ተስተካክሏል ---
 WEBAPP_URL = "https://tiiny.site"
 
 # የቦቱ አዝራሮች (Commands) በአማርኛ
@@ -44,7 +44,7 @@ set_bot_commands()
 # የ /start ትዕዛዝ ሲላክ የሚመጣ መልስ
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    # --- የእርስዎ ስልክ ቁጥሮች እዚህ ተስተካክለዋል ---
+    # --- 3. የእርስዎ የቴሌብር ስልክ ቁጥሮች እዚህ ተስተካክለዋል ---
     owner_name = "የእርስዎ ስም"
     account_1 = "0940403289"
     account_2 = "0979152240"
