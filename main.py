@@ -45,7 +45,7 @@ set_bot_commands()
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     # --- 3. የእርስዎ የቴሌብር ስልክ ቁጥሮች እዚህ ተስተካክለዋል ---
-    owner_name = "የእርስዎ ስም"
+    owner_name = "ሀረር ቢንጎ"
     account_1 = "0940403289"
     account_2 = "0979152240"
     
