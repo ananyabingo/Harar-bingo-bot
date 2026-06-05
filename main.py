@@ -1,4 +1,5 @@
-import os import random
+import os 
+import random
 import threading
 import time
 from telebot import TeleBot, types
