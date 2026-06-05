@@ -1,4 +1,4 @@
-import os 
+import os
 import random
 import threading
 import time
@@ -75,10 +75,11 @@ def deposit_request(message):
     info_text = "💵 **አካውንት ለመሙላት**\n\n1. በቴሌብር (Telebirr) ቁጥር `0940403289` ላይ መክፈል የሚፈልጉትን ብር ይላኩ。\n2. የከፈሉበትን **የሂሳብ ማረጋገጫ (Screenshot)** እዚህ ቦት ላይ ይላኩ。\n\nአስተዳዳሪው አይቶ ወዲያውኑ ብር ያዝልዎታል።"
     bot.send_message(message.chat.id, info_text, parse_mode="Markdown")
 
-@bot.message_handler(content_types=['photo', 'text'], func=lambda msg: not msg.text in ["🎮 Play / ተጫወት", "💵 Wallet / ሂሳብ", "💰 Deposit / ብር አስገባ", "🏆 Bingo! / አሸነፍኩ"])
+@bot.message_handler(content_types=['photo'])
 def handle_receipt(message):
     user_id = message.from_user.id
     if game_state["admin_id"]:
+        bot.forward_message(game_state["admin_id"], message.chat.id, message.message_id)
         bot.send_message(game_state["admin_id"], f"📩 አዲስ የክፍያ ሪሲፕት ከ User ID: `{user_id}` መጥቷል።\nእባክህ ቼክ አድርገህ ብር ለመጨመር `/add {user_id} መጠን` ብለህ ጻፍ።")
     bot.send_message(message.chat.id, "✅ ሪሲፕትዎ ለአስተዳዳሪ ተልኳል! በአጭር ደቂቃ ውስጥ ይረጋገጣል።")
 
